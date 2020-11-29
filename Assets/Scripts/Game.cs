@@ -21,4 +21,12 @@ public class Game : MonoBehaviour {
 		Input = new Actions();
 		DontDestroyOnLoad(this);
 	}
+
+	private void OnApplicationQuit() {
+		// disconnect from server
+		// stop server
+		Network.Client.Instance.Disconnect();
+		//Network.Server.
+		throw new System.NotImplementedException("Finish this");
+	}
 }
