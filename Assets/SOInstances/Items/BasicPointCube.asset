@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76904c72ab1aacc4083b2d0a8a7c157e, type: 3}
+  m_Name: BasicPointCube
+  m_EditorClassIdentifier: 
+  _itemTypes:
+    m_keys:
+    - {fileID: 11400000, guid: 58ed0fccaa611034393b3d991e1fde1d, type: 2}
+  _value: 1

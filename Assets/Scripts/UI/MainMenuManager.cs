@@ -5,67 +5,66 @@ using System.Threading.Tasks;
 using System.Net;
 
 public class MainMenuManager : MonoBehaviour {
+	[SerializeField, NotNull]
+	private Button _connectButton = null;
+	[SerializeField, NotNull]
+	private Button _hostButton = null;
 
-	[SerializeField]
-	private Button _connectButton;
-	[SerializeField]
-	private Button _hostButton;
-
-	[SerializeField]
-	private TMPro.TMP_InputField _connectIP;
-	[SerializeField]
-	private TMPro.TMP_InputField _connectPort;
-	[SerializeField]
-	private TMPro.TMP_InputField _hostPort;
+	[SerializeField, NotNull]
+	private TMPro.TMP_InputField _connectIP = null;
+	[SerializeField, NotNull]
+	private TMPro.TMP_InputField _connectPort = null;
+	[SerializeField, NotNull]
+	private TMPro.TMP_InputField _hostPort = null;
 	[SerializeField]
 	private ushort _maxPlayers = 10;
+	[SerializeField, NotNull]
+	private GameObject _connectHost = null;
+	[SerializeField, NotNull]
+	private TMPro.TMP_Text _connectMessage = null;
+	[SerializeField, NotNull]
+	private Server_ServerSO _serverSO = null;
 
-	[SerializeField]
-	private GameObject _connectHost;
-
-	[SerializeField]
-	private TMPro.TMP_Text _connectMessage;
-
-	private void Start() {
+	private void OnEnable() {
 		_connectButton.onClick.AddListener(Connect);
 		_hostButton.onClick.AddListener(StartServer);
 	}
 
+	private void OnDisable() {
+		_connectButton.onClick.RemoveListener(Connect);
+		_hostButton.onClick.RemoveListener(StartServer);
+	}
+
 	public void StartServer(){
-		if(System.Int32.TryParse(_hostPort.text, out int port))
-			Network.Server.Start(port, _maxPlayers);
+		if(System.Int32.TryParse(_hostPort.text, out int port)){
+			_serverSO.StartServer(port, _maxPlayers);
+		}
 		else
-			Debug.Log("Bad Server Port");
+			DisplayMessageCoroutine("Bad Server Port");
 	}
 
 	public void Connect(){
 		bool issue = false;
 		if(!IPAddress.TryParse(_connectIP.text, out IPAddress ipAddress)){
-			Debug.Log("Bad IP Address");
+			StartCoroutine(DisplayMessageCoroutine("Bad IP Address"));
 			issue = true;
 		}
 		if(!System.Int32.TryParse(_connectPort.text, out int port)){
-			Debug.Log("Bad Client Port");
+			StartCoroutine(DisplayMessageCoroutine("Bad Client Port"));
 			issue = true;
 		}
 		if(issue) return;
-		StartCoroutine(ConnectingCoroutine(Network.Client.Instance.Connect(ipAddress, port)));
 
+		_connectHost.SetActive(false);
+		StartCoroutine(ConnectingCoroutine(Game.Instance.Connect(ipAddress, port)));
 	}
 
 	private IEnumerator ConnectingCoroutine(Task<bool> t){
-
-		_connectHost.SetActive(false);
-
 		for(;;){
 			if(t.IsCompleted){
-				if(t.Result){
-					// Connected Successfully
-					// transition to next scene
-
-				}else{
+				if(!t.Result){
 					// Failure to connect (timeout)
-					StartCoroutine(FailedToConnectCoroutine("Timeout"));
+					StartCoroutine(DisplayMessageCoroutine("Failed to connect: Timeout"));
 				}
 				yield break;
 			}
@@ -73,13 +72,11 @@ public class MainMenuManager : MonoBehaviour {
 		}
 	}
 
-	private IEnumerator FailedToConnectCoroutine(string failureReason){
+	private IEnumerator DisplayMessageCoroutine(string message){
 		// display message
-		SetConnectMessage($"Failed to Connect: {failureReason}");
+		_connectMessage.text = message;
 		// return to connect/host menu
 		_connectHost.SetActive(true);
 		yield break;
 	}
-
-	private void SetConnectMessage(string message) => _connectMessage.text = message;
 }
