@@ -29,7 +29,7 @@ public class ServerGameManager : MonoBehaviour {
 		//ServerLogic.PacketHandlers.Add( , );
 	}
 
-	private Dictionary<byte,Server_ManagedPlayer> _players = new Dictionary<byte,Server_ManagedPlayer>();
+	private Dictionary<byte,ManagedEntity> _players = new Dictionary<byte,ManagedEntity>();
 
 	public void StartServer(int port, ushort _maxPlayers) {
 		throw new System.NotImplementedException("Finish this");
@@ -47,7 +47,7 @@ public class ServerGameManager : MonoBehaviour {
 		throw new System.NotImplementedException("Finish this");
 	}
 
-	public void AddPlayer(byte playerIdx) => _players.Add(playerIdx, Instantiate(_playerPrefab, new Vector3(0,1,0), Quaternion.identity).GetComponent<Server_ManagedPlayer>());
+	public void AddPlayer(byte playerIdx) => _players.Add(playerIdx, Instantiate(_playerPrefab, new Vector3(0,1,0), Quaternion.identity).GetComponent<ManagedEntity>());
 
-	public Server_ManagedPlayer GetPlayer(byte playerIdx) => _players[playerIdx];
+	public ManagedEntity GetPlayer(byte playerIdx) => _players[playerIdx];
 }

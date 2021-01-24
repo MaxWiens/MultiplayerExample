@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -553,7 +554,7 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer
 			if(!ComparePropertyValues(value1, value2))
 				return false;
 		}
-		
+
 		return true;
 	}
 
@@ -606,3 +607,4 @@ public class SerializableDictionaryStoragePropertyDrawer : PropertyDrawer
 		return EditorGUI.GetPropertyHeight(property);
 	}
 }
+#endif

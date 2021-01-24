@@ -1,4 +1,5 @@
-﻿namespace RedBlueGames.NotNull
+﻿#if UNITY_EDITOR
+namespace RedBlueGames.NotNull
 {
     using UnityEditor;
     using UnityEngine;
@@ -58,7 +59,7 @@
             // Calculate warning rectangle's size
             Rect warningRect = new Rect(
                                    position.x,
-                                   objectReferenceRect.y + objectReferenceHeight, 
+                                   objectReferenceRect.y + objectReferenceHeight,
                                    position.width,
                                    this.warningHeight);
             this.BuildWarningRectangle(warningRect, property);
@@ -91,7 +92,7 @@
         }
 
         private void BuildObjectField(Rect drawArea, SerializedProperty property, GUIContent label)
-        {   
+        {
             if (property.propertyType != SerializedPropertyType.ObjectReference)
             {
                 EditorGUI.PropertyField(drawArea, property, label);
@@ -128,3 +129,4 @@
         }
     }
 }
+#endif

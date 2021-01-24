@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: Server_Server
   m_EditorClassIdentifier: 
   _packets: {fileID: 11400000, guid: 1d65036232c9cd0408591b31a64169c4, type: 2}
+  _updaterPrefab: {fileID: 6938222276186108959, guid: 231c4b43195372e4ba7c0086da9c2b97,
+    type: 3}

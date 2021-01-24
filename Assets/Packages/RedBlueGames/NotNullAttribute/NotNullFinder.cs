@@ -1,4 +1,5 @@
-﻿namespace RedBlueGames.NotNull
+﻿#if UNITY_EDITOR
+namespace RedBlueGames.NotNull
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -85,3 +86,4 @@
         }
     }
 }
+#endif

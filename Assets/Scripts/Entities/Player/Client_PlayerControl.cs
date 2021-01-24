@@ -15,6 +15,11 @@ public class Client_PlayerControl : MonoBehaviour {
 	private void OnDisable() {
 		_input.Moved -= OnInputMoveVectorChange;
 	}
+	private void Start() {
+		if(_playerCamera == null && (_playerCamera = Camera.main.transform) == null){
+			Debug.LogError("PlayerControl could not find camera");
+		}
+	}
 
 	private void Update() {
 		Vector3 v = _playerCamera.forward;

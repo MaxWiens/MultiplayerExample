@@ -24,7 +24,7 @@ public class Game : MonoBehaviour {
 			return;
 		}
 
-		NetLib.Globals.DebugLog = Debug.Log;
+
 
 		// register handlers for client and server
 	}

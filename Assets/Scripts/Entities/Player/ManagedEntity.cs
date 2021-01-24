@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Server_ManagedPlayer : MonoBehaviour, IEntity, IManaged {
+public class ManagedEntity : MonoBehaviour, IEntity, IManaged {
 	public EntityData Data {get; set;}
 	private Action<GameObject> _deactivator;
 

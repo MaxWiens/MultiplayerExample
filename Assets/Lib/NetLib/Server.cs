@@ -10,7 +10,8 @@ namespace NetLib {
 	using ServerPacketRegistry = PacketRegistry<ServerPacketHandler>;
 
 	public class Server {
-		public event Action<byte> NewClientAdded;
+		public event Action<byte> ClientConnected;
+		public event Action<byte> ClientDisconnected;
 
 		public ushort MaxClients { get; private set;}
 		public int Port { get; private set; }
@@ -42,7 +43,7 @@ namespace NetLib {
 		/// <param name="maxClients">Max number of clients to support. Max 256</param>
 		public Action Start(int port, ushort maxClients){
 			#if (NETWORK_DEBUG)
-				Globals.DebugLog($"Starting server on port {port}, max clients {maxClients}...");
+				Globals.DebugLog?.Invoke($"Starting server on port {port}, max clients {maxClients}...");
 			#endif
 
 			if(maxClients > byte.MaxValue)
@@ -54,8 +55,8 @@ namespace NetLib {
 			MaxClients = maxClients;
 			Port = port;
 
-			for(byte clientIdx = 0; clientIdx < MaxClients; clientIdx++)
-				_avilableClientIDs.Push(clientIdx);
+			// for(byte clientIdx = 0; clientIdx < MaxClients; clientIdx++)
+			// 	_avilableClientIDs.Push(clientIdx);
 
 			_tcpListener = new TcpListener(IPAddress.Any, Port);
 			_tcpListener.Start();
@@ -65,7 +66,7 @@ namespace NetLib {
 			_udpSocket.BeginReceive(UDPRecvCallback, null);
 
 			#if (NETWORK_DEBUG)
-				Globals.DebugLog("Server started!");
+				Globals.DebugLog?.Invoke("Server started!");
 			#endif
 
 			return _threadManager.Update;
@@ -82,12 +83,12 @@ namespace NetLib {
 					client.TcpStream.BeginWrite(packetData, 0, packetData.Length, null, null);
 				}catch (Exception ex){
 					#if (NETWORK_DEBUG)
-						Globals.DebugLog($"Error sending data to client {clientID} using TCP: {ex}");
+						Globals.DebugLog?.Invoke($"Error sending data to client {clientID} using TCP: {ex}");
 					#endif
 				}
 			}else{
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog($"Attempt to send packet to {clientID} who doesn't exist");
+					Globals.DebugLog?.Invoke($"Attempt to send packet to {clientID} who doesn't exist");
 				#endif
 			}
 		}
@@ -102,7 +103,7 @@ namespace NetLib {
 					client.TcpStream.BeginWrite(packetData, 0, packetData.Length, null, null);
 				}catch (Exception ex){
 					#if (NETWORK_DEBUG)
-						Globals.DebugLog($"Error sending data to client {client.ClientIndex} using TCP: {ex}");
+						Globals.DebugLog?.Invoke($"Error sending data to client {client.ClientIndex} using TCP: {ex}");
 					#endif
 				}
 			}
@@ -120,7 +121,7 @@ namespace NetLib {
 						client.TcpStream.BeginWrite(packetData, 0, packetData.Length, null, null);
 					}catch (Exception ex){
 						#if (NETWORK_DEBUG)
-							Globals.DebugLog($"Error sending data to client {client.ClientIndex} using TCP: {ex}");
+							Globals.DebugLog?.Invoke($"Error sending data to client {client.ClientIndex} using TCP: {ex}");
 						#endif
 					}
 				}
@@ -138,12 +139,12 @@ namespace NetLib {
 					_udpSocket.BeginSend(packet, packet.Length, client.IPEndPoint, null, null);
 				}catch (Exception ex){
 					#if (NETWORK_DEBUG)
-						Globals.DebugLog($"Error sending data to client {clientIdx} using TCP: {ex}");
+						Globals.DebugLog?.Invoke($"Error sending data to client {clientIdx} using TCP: {ex}");
 					#endif
 				}
 			}else{
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog($"Attempt to send packet to {clientIdx} who doesn't exist");
+					Globals.DebugLog?.Invoke($"Attempt to send packet to {clientIdx} who doesn't exist");
 				#endif
 			}
 		}
@@ -154,7 +155,7 @@ namespace NetLib {
 					_udpSocket.BeginSend(data, data.Length, client.IPEndPoint, null, null);
 				}catch (Exception ex){
 					#if (NETWORK_DEBUG)
-						Globals.DebugLog($"Error sending data to client {client.ClientIndex} using TCP: {ex}");
+						Globals.DebugLog?.Invoke($"Error sending data to client {client.ClientIndex} using TCP: {ex}");
 					#endif
 				}
 			}
@@ -182,22 +183,28 @@ namespace NetLib {
 			TcpClient socket = _tcpListener.EndAcceptTcpClient(result);
 			_tcpListener.BeginAcceptTcpClient(TCPConnectCallback, null); // continue to listen for annother connection asynchronously
 			#if (NETWORK_DEBUG)
-				Globals.DebugLog($"Incoming connection from {socket.Client.RemoteEndPoint}");
+				Globals.DebugLog?.Invoke($"Incoming connection from {socket.Client.RemoteEndPoint}");
 			#endif
-
+			int count = _clients.Count;
 			// add client to clients array
-			if(_avilableClientIDs.Count > 0){
-				byte newClientIdx = _avilableClientIDs.Pop();
+			if(count < MaxClients){
+				byte newClientIdx;
+				if(_avilableClientIDs.Count > 0){
+					newClientIdx = _avilableClientIDs.Pop();
+				}else{
+					newClientIdx = (byte)count;
+				}
+
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog($"Creating Client idx: {newClientIdx} for {socket.Client.RemoteEndPoint}");
+					Globals.DebugLog?.Invoke($"Creating Client idx: {newClientIdx} for {socket.Client.RemoteEndPoint}");
 				#endif
 				_clients[newClientIdx] = new Client(socket, newClientIdx, this);
 				// send welcome message
 				SendWelcome(newClientIdx);
-				NewClientAdded?.Invoke(newClientIdx);
+				_threadManager.ExecuteOnMainThread(()=>ClientConnected?.Invoke(newClientIdx));
 			}else{
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog($"{socket.Client.RemoteEndPoint} failed to connect. Server full!");
+					Globals.DebugLog?.Invoke($"{socket.Client.RemoteEndPoint} failed to connect. Server full!");
 				#endif
 
 				// send server full packet
@@ -233,7 +240,7 @@ namespace NetLib {
 										handler(clientIdx, packetReader);
 									#if (NETWORK_DEBUG)
 									else {
-										Globals.DebugLog($"No Client Packethandler for {packetType}");
+										Globals.DebugLog?.Invoke($"No Client Packethandler for {packetType}");
 									}
 									#endif
 								}
@@ -245,7 +252,7 @@ namespace NetLib {
 				}
 			}catch(Exception ex){
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog($"Error receiving UDP data: {ex}");
+					Globals.DebugLog?.Invoke($"Error receiving UDP data: {ex}");
 				#endif
 				return;
 			}
@@ -257,8 +264,11 @@ namespace NetLib {
 				client.TcpStream.Close();
 				_clients.Remove(clientIdx);
 				_avilableClientIDs.Push(clientIdx);
+				_threadManager.ExecuteOnMainThread(()=>ClientDisconnected?.Invoke(clientIdx));
 			}
 		}
+
+		public IEnumerable<byte> ClientIdxs => _clients.Keys;
 
 		private class Client {
 			public readonly string EndPointStr;
@@ -308,7 +318,7 @@ namespace NetLib {
 					TCPHandleData(data);
 				}catch(Exception ex){
 					#if (NETWORK_DEBUG)
-						Globals.DebugLog($"Error receiving TCP data: {ex}");
+						Globals.DebugLog?.Invoke($"Error receiving TCP data: {ex}");
 					#endif
 					_server.Disconnect(ClientIndex);
 				}
@@ -337,7 +347,7 @@ namespace NetLib {
 								handler(ClientIndex, pr);
 							#if (NETWORK_DEBUG)
 							else {
-								Globals.DebugLog($"No Client Packethandler for {packetType}");
+								Globals.DebugLog?.Invoke($"No Client Packethandler for {packetType}");
 							}
 							#endif
 						}

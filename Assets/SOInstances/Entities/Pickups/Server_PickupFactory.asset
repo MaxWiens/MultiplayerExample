@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd20c38a9e7526a489595d89ba4bdc46, type: 3}
   m_Name: Server_PickupFactory
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2370278202700987232, guid: 950ef7fb21d49d54da2e208e76e8f8b7, type: 3}
+  _prefab: {fileID: 2370278202700987232, guid: 950ef7fb21d49d54da2e208e76e8f8b7, type: 3}

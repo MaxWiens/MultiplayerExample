@@ -1,4 +1,5 @@
-﻿namespace RedBlueGames.NotNull
+﻿#if UNITY_EDITOR
+namespace RedBlueGames.NotNull
 {
     using System.Collections;
     using UnityEditor;
@@ -26,3 +27,4 @@
         }
     }
 }
+#endif

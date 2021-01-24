@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Client_CollectGameScene.unity
     guid: 99b06d22ecbea654ebbd1a881d9d865e
+  - enabled: 1
+    path: Assets/Scenes/Server_CollectGameScene.unity
+    guid: 3ec2a62c701190240ba747f003f3f413
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 21857fd5804903c40aebb66443084553,
       type: 2}

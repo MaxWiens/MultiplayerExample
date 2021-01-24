@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb3233a6fb06959439c3ceda1ec9ee9b, type: 3}
+  m_Script: {fileID: 11500000, guid: a68d4d5c493aeb642bbc858f2d9d8ddb, type: 3}
   m_Name: Server_PlayerPool
   m_EditorClassIdentifier: 
   _maxPoolSize: 20

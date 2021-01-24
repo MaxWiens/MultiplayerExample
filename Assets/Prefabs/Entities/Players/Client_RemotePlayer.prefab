@@ -1,5 +1,30 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &5710307933024725007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2732469219864979183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eee42be467ef48b48923b56851469394, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4719026771530012830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2732469219864979183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae0e19e4573c5f543ad0c71b2fa2b074, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _value: 0
 --- !u!1 &7588165787082687726
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,6 +38,7 @@ GameObject:
   - component: {fileID: 494339646972092713}
   - component: {fileID: 2682670275949648260}
   - component: {fileID: 7546644629842855385}
+  - component: {fileID: 6558429505310265977}
   m_Layer: 0
   m_Name: ScoreDisplay
   m_TagString: Untagged
@@ -188,6 +214,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5558f4e96beb28429b3fa845c62ece0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6558429505310265977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7588165787082687726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe4f285bbefa8b44daec9d999d27866f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _score: {fileID: 4719026771530012830}
+  _text: {fileID: 2682670275949648260}
 --- !u!1001 &6943339426481506063
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -198,7 +238,7 @@ PrefabInstance:
     - target: {fileID: 5021544564114629088, guid: fd2cfe6890d231d4881f01d60d1e2388,
         type: 3}
       propertyPath: m_Name
-      value: Client_RemotePlayerVariant
+      value: Client_RemotePlayer
       objectReference: {fileID: 0}
     - target: {fileID: 5691367405942012762, guid: fd2cfe6890d231d4881f01d60d1e2388,
         type: 3}
@@ -257,6 +297,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fd2cfe6890d231d4881f01d60d1e2388, type: 3}
+--- !u!1 &2732469219864979183 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5021544564114629088, guid: fd2cfe6890d231d4881f01d60d1e2388,
+    type: 3}
+  m_PrefabInstance: {fileID: 6943339426481506063}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3359824872536407125 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5691367405942012762, guid: fd2cfe6890d231d4881f01d60d1e2388,

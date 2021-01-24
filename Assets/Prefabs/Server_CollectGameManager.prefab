@@ -64,7 +64,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1634769109151613270}
   m_Layer: 0
-  m_Name: CollectGame
+  m_Name: Server_CollectGameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,7 +95,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1634769109202148836}
-  - component: {fileID: 1634769109202148839}
   m_Layer: 0
   m_Name: PickupManager
   m_TagString: Untagged
@@ -117,21 +116,3 @@ Transform:
   m_Father: {fileID: 1634769109151613270}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1634769109202148839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1634769109202148838}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a97ef0b827ac2cb4a987b2d0ba406125, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pickupPrefab: {fileID: 2370278202700987232, guid: 950ef7fb21d49d54da2e208e76e8f8b7,
-    type: 3}
-  _isGenerating: 1
-  _center: {fileID: 1634769109202148836}
-  _radius: 24
-  _generateDelay: 3

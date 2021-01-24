@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8eb54fda9767554caa55a57de311276, type: 3}
   m_Name: Client_Client
   m_EditorClassIdentifier: 
+  _updaterPrefab: {fileID: 6938222276186108959, guid: 231c4b43195372e4ba7c0086da9c2b97,
+    type: 3}
   _packets: {fileID: 11400000, guid: e6508d7a7a6c8f64780101f344980011, type: 2}

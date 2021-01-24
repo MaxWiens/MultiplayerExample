@@ -5,4 +5,10 @@ public class Server_CollectingGameManager : MonoBehaviour {
 	private Server_PlayerManager _playerManager;
 	[SerializeField, NotNull]
 	private Server_PickupManager _pickupManager;
+	[SerializeField, NotNull]
+	private Server_PacketsSO _packets;
+
+	private void OnEnable() {
+
+	}
 }

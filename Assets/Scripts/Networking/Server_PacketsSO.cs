@@ -11,9 +11,8 @@ public class Server_PacketsSO : ScriptableObject {
 
 	public ushort PlayerJoinedID {get; private set;}
 	public ushort PlayerRemovedID {get; private set;}
-	public ushort PlayerPositionID {get; private set;}
+	public ushort PlayerTransformUpdateID {get; private set;}
 	public ushort PlayerScoreID {get; private set;}
-	public ushort PlayerMoveID {get; private set;}
 
 	public ushort PickupSpawnedID {get; private set;}
 	public ushort PickupRemovedID {get; private set;}
@@ -21,7 +20,7 @@ public class Server_PacketsSO : ScriptableObject {
 	public ServerPTD[] GetPacketData() => new ServerPTD[]{
 		new ServerPTD(PacketNames.PLAYER_JOINED),
 		new ServerPTD(PacketNames.PLAYER_REMOVED),
-		new ServerPTD(PacketNames.PLAYER_POSITION),
+		new ServerPTD(PacketNames.PLAYER_TRANSFORM_UPDATE),
 		new ServerPTD(PacketNames.PLAYER_SCORE),
 		new ServerPTD(PacketNames.PLAYER_MOVE, PlayerMoveHandler),
 
@@ -33,9 +32,8 @@ public class Server_PacketsSO : ScriptableObject {
 		PacketRegistry<ServerPacketHandler> r = _server.Registry;
 		PlayerJoinedID = r.GetID(PacketNames.PLAYER_JOINED);
 		PlayerRemovedID = r.GetID(PacketNames.PLAYER_REMOVED);
-		PlayerPositionID = r.GetID(PacketNames.PLAYER_POSITION);
+		PlayerTransformUpdateID = r.GetID(PacketNames.PLAYER_TRANSFORM_UPDATE);
 		PlayerScoreID = r.GetID(PacketNames.PLAYER_SCORE);
-		PlayerMoveID = r.GetID(PacketNames.PLAYER_MOVE);
 
 		PickupSpawnedID = r.GetID(PacketNames.PICKUP_SPAWNED);
 		PickupRemovedID = r.GetID(PacketNames.PICKUP_REMOVED);

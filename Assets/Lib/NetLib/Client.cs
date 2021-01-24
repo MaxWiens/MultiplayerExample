@@ -38,6 +38,7 @@ namespace NetLib {
 			allPacketData.AddRange(customPacketTypes);
 			Registry = new ClientPacketRegistry(allPacketData);
 			_handlers = Registry.Handlers;
+			_packets.Welcome += FinalizeConnection;
 		}
 
 		public Action Connect(IPAddress ip, int port){
@@ -68,7 +69,7 @@ namespace NetLib {
 			_udpSocket = new UdpClient(((IPEndPoint)_tcpSocket.Client.LocalEndPoint).Port);
 			_udpSocket.Connect(_udpEndPoint);
 			_udpSocket.BeginReceive(UDPReceiveCallback, null);
-			ConnectionFinalized?.Invoke();
+			_threadManager.ExecuteOnMainThread(()=>ConnectionFinalized?.Invoke());
 		}
 
 		public void Disconnect(DisconnectReason reason, string description){
@@ -76,17 +77,15 @@ namespace NetLib {
 				return;
 
 			_tcpSocket.Close();
-			_udpSocket.Close();
-
-			_tcpStream.Dispose(); // needed?
+			if(State == ClientState.Connected){
+				_udpSocket.Close();
+				_tcpStream.Dispose(); // needed?
+			}
 			_tcpStream = null;
-
-			_tcpPacketReader.Dispose(); // needed?
-			_tcpPacketReader = null;
-
 			_tcpRecvBuffer = null;
 			State = ClientState.Disconnected;
-			Disconnected?.Invoke(reason, description);
+			_threadManager.ExecuteOnMainThread(()=>Disconnected?.Invoke(reason, description));
+
 		}
 
 		//*********************
@@ -103,12 +102,12 @@ namespace NetLib {
 					_tcpStream.BeginWrite(packet, 0, packet.Length, null, null);
 				}catch(Exception ex){
 					#if (NETWORK_DEBUG)
-						Globals.DebugLog($"Error sending TCP message to Server: {ex}");
+						Globals.DebugLog?.Invoke($"Error sending TCP message to Server: {ex}");
 					#endif
 				}
 			}else{
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog($"Error sending TCP message to Server: not connected to server");
+					Globals.DebugLog?.Invoke($"Error sending TCP message to Server: not connected to server");
 				#endif
 			}
 		}
@@ -153,7 +152,7 @@ namespace NetLib {
 							handler(pr);
 						#if (NETWORK_DEBUG)
 						else {
-							Globals.DebugLog($"No Client Packethandler for {packetType}");
+							Globals.DebugLog?.Invoke($"No Client Packethandler for {packetType}");
 						}
 						#endif
 					}
@@ -180,13 +179,13 @@ namespace NetLib {
 					_udpSocket.BeginSend(packet, packet.Length, null, null);
 				}catch(Exception ex){
 					#if (NETWORK_DEBUG)
-						Globals.DebugLog($"Error sending TCP message to Server: {ex}");
+						Globals.DebugLog?.Invoke($"Error sending TCP message to Server: {ex}");
 					#endif
 
 				}
 			}else{
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog($"Error sending TCP message to Server: not connected to server");
+					Globals.DebugLog?.Invoke($"Error sending TCP message to Server: not connected to server");
 				#endif
 			}
 		}
@@ -222,7 +221,7 @@ namespace NetLib {
 						handler(pr);
 					#if (NETWORK_DEBUG)
 					else {
-						Globals.DebugLog($"No Client Packethandler for {packetType}");
+						Globals.DebugLog?.Invoke($"No Client Packethandler for {packetType}");
 					}
 					#endif
 				}

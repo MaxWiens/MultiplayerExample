@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using NetLib;
+using System.Collections.Generic;
+using System;
+
 public class Server_PlayerManager : MonoBehaviour {
 	[SerializeField, NotNull]
 	private GameObjectPoolSO _managedPlayerPool = null;
@@ -8,14 +11,48 @@ public class Server_PlayerManager : MonoBehaviour {
 	private Transform _spawnPoint = null;
 	[SerializeField, NotNull]
 	private Server_ServerSO _server = null;
+	[SerializeField, NotNull]
+	private Server_PacketsSO _packets = null;
 
-	private ushort SpawnPlayerID;
-	public const string PLAYER_SPAWN_PACKET_NAME = "MultiplayerExample_PlayerSpawn";
+	private	Dictionary<byte,EntityData> _players = new Dictionary<byte,EntityData>();
+
 	private void OnEnable() {
-		SpawnPlayerID = SpawnPlayerID = _server.Registry.GetID(PLAYER_SPAWN_PACKET_NAME);
+		_server.PlayerJoined += OnPlayerJoined;
+		_server.PlayerLeft += OnPlayerLeave;
 	}
 
-	public bool SpawnPlayer(PlayerData playerData) {
+	private void OnDisable() {
+		_server.PlayerJoined -= OnPlayerJoined;
+		_server.PlayerLeft -= OnPlayerLeave;
+	}
+
+	private void Start() {
+		foreach(byte id in _server.ClientIdxs){
+			EntityData playerData = new EntityData(id);
+			_players.Add(id, playerData);
+			if(!SpawnPlayer(playerData)){
+				Debug.LogError("Unable to spawn player, pool is full!");
+			}
+		}
+	}
+
+	private void OnPlayerJoined(byte playerIdx){
+		if(!_players.ContainsKey(playerIdx)){
+			EntityData playerData = new EntityData(playerIdx);
+			_players.Add(playerIdx, playerData);
+			if(!SpawnPlayer(playerData)){
+				Debug.LogError("Unable to spawn player, pool is full!");
+			}
+		}
+	}
+
+	private void OnPlayerLeave(byte playerIdx){
+		if(_players.TryGetValue(playerIdx, out EntityData playerData)){
+			RemovePlayer(playerData);
+		}
+	}
+
+	public bool SpawnPlayer(EntityData playerData) {
 		GameObject player = _managedPlayerPool.Get();
 		if(player == null) return false;
 		// set player position;
@@ -24,35 +61,67 @@ public class Server_PlayerManager : MonoBehaviour {
 		playerData.Object = player;
 		player.GetComponent<IEntity>().Data = playerData;
 		// set manager callbacks
-		player.GetComponent<IManaged>().SetCallbacks(DeactivatePlayer);
+		player.GetComponent<IManaged>().SetCallbacks(UnmanagePlayer);
 		// set score to zero
 		player.GetComponent<IScorable>().Value = 0;
 
+		foreach(var pl in _players.Values){
+			if(pl.ID != playerData.ID){
+				using (PacketBuilder p = new PacketBuilder(_packets.PlayerJoinedID)){
+					p.Write(pl.ID);
+					Vector3 v = pl.Object.transform.position;
+					p.Write(new Vector2(v.x, v.z));
+					_server.SendTCP(playerData.ID, p.Build());
+				}
+			}
+		}
+
 		// send new player info
-		using (PacketBuilder p = new PacketBuilder(SpawnPlayerID)){
+		using (PacketBuilder p = new PacketBuilder(_packets.PlayerJoinedID)){
+			p.Write(playerData.ID);
 			p.Write(new Vector2(_spawnPoint.position.x, _spawnPoint.position.z));
 			_server.SendTCPAll(p.Build());
 		}
 		return true;
 	}
 
-	public void UpdatePositions(){
+	private void FixedUpdate() {
+		UpdateTransforms();
+	}
+
+	public void UpdateTransforms(){
 		Vector2 v = new Vector2();
-		foreach(var p in _managedPlayerPool.ActiveObjects){
-			v.Set(p.transform.position.x, p.transform.position.z);
+		Vector3 vp;
+		foreach(var p in _players.Values){
+			vp = p.Object.transform.position;
+			v.Set(vp.x, vp.z);
 			// update positions and send to players
-			using (PacketBuilder pb = new PacketBuilder(SpawnPlayerID)){
+			using (PacketBuilder pb = new PacketBuilder(_packets.PlayerTransformUpdateID)){
+				pb.Write(p.ID);
 				pb.Write(v);
+				pb.Write(p.Object.transform.eulerAngles.y);
 				_server.SendUDPAll(pb.Build());
 			}
 		}
 	}
 
-	public void DeactivatePlayer(GameObject player){
+	public void RemovePlayer(EntityData playerData){
+		if(_players.ContainsValue(playerData)){
+			using (PacketBuilder pb = new PacketBuilder(_packets.PlayerRemovedID)){
+				pb.Write(playerData.ID);
+				_server.SendUDPAll(pb.Build());
+			}
+			UnmanagePlayer(playerData.Object);
+		}else{
+			Debug.LogWarning("attempt to remove player not managed by player manager");
+		}
+	}
+
+
+	private void UnmanagePlayer(GameObject player){
 		if(!_managedPlayerPool.PutBack(player)){
 			Debug.LogWarning("Player not managed by this manager");
 		}
-		//send data
 	}
 }
 
@@ -64,7 +133,7 @@ public class Server_PlayerManager_Editor : Editor {
 		base.OnInspectorGUI();
 		if(Application.IsPlaying(target)){
 			if(GUILayout.Button("Spawn Player"))
-				((Server_PlayerManager)target).SpawnPlayer(new PlayerData(-1, System.DateTime.Now));
+				((Server_PlayerManager)target).SpawnPlayer(new EntityData(0));
 		}
 	}
 }
