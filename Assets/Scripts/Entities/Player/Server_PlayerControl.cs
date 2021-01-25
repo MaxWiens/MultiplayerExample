@@ -5,7 +5,6 @@ public class Server_PlayerControl : MonoBehaviour {
 	private Rigidbody _rb = null;
 	[SerializeField]
 	private float _speed = 5f;
-	private Vector3 v = Vector3.zero;
 	private bool _isStopping = false;
 	private float _stoppingTime = 0f;
 	private Vector3 _stoppingVelocity = Vector3.zero;
@@ -31,6 +30,6 @@ public class Server_PlayerControl : MonoBehaviour {
 		_moveDirection.x = direction.x;
 		_moveDirection.z = direction.y;
 		_moveDirection.Normalize();
-		transform.localRotation = Quaternion.LookRotation(Vector3.down, v);
+		transform.localRotation = Quaternion.LookRotation(Vector3.down, _moveDirection);
 	}
 }
