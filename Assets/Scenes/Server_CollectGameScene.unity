@@ -238,12 +238,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23007d9e2830bed4cb0405c012b9ffc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _server: {fileID: 11400000, guid: d41d721f61ae5f0468f8645638f1e9ef, type: 2}
+  _packets: {fileID: 11400000, guid: 1d65036232c9cd0408591b31a64169c4, type: 2}
   _pickupPool: {fileID: 11400000, guid: 307ca0f29f82ded4594335704544180f, type: 2}
   _spawnTimer:
     _endTime: 3
     _isLooping: 1
     _isActive: 1
-  IsGenerating: 0
+  IsGenerating: 1
   _center: {fileID: 1634769107573194665}
   _radius: 24
 --- !u!1 &1634769107573194667

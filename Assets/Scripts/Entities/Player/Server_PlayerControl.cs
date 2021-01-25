@@ -8,11 +8,20 @@ public class Server_PlayerControl : MonoBehaviour {
 	private Vector3 v = Vector3.zero;
 	private bool _isStopping = false;
 	private float _stoppingTime = 0f;
-	private Vector3 stoppingVelocity = Vector3.zero;
-	private Vector3 _moveDirection;
+	private Vector3 _stoppingVelocity = Vector3.zero;
+	private Vector3 _moveDirection = Vector3.zero;
 	private void FixedUpdate() {
-		if(_moveDirection.magnitude == 0f && _rb.velocity.magnitude > 0){
-			_rb.velocity = Vector3.SmoothDamp(_rb.velocity, Vector3.zero, ref stoppingVelocity, _stoppingTime);
+		if(!_isStopping && _moveDirection.magnitude == 0f && _rb.velocity.magnitude > 0){
+			_isStopping = true;
+			_stoppingTime = 0f;
+			_stoppingVelocity = Vector3.zero;
+		}
+		if(_isStopping){
+			_stoppingTime += Time.fixedDeltaTime;
+			_rb.velocity = Vector3.SmoothDamp(_rb.velocity, Vector3.zero, ref _stoppingVelocity, _stoppingTime);
+			if(_stoppingTime >= 1f){
+				_isStopping = false;
+			}
 		}else{
 			_rb.velocity = _moveDirection * _speed;
 		}

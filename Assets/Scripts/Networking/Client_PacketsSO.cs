@@ -10,6 +10,10 @@ public class Client_PacketsSO : ScriptableObject {
 	public event Action<byte,Vector2,float> PlayerTransformUpdate;
 	public event Action<byte,int> PlayerScoreChanged;
 
+	public Queue<(byte,Vector2)> PickupSpawnedQueue = new Queue<(byte, Vector2)>();
+	public event Action<byte,Vector2> PickupSpawned;
+	public event Action<byte> PickupRemoved;
+
 	public ushort PlayerMoveID {get; private set;}
 
 	[SerializeField, NotNull]
@@ -71,9 +75,15 @@ public class Client_PacketsSO : ScriptableObject {
 
 	// Pickup
 	private void PickupSpawnedHandler(PacketReader packetReader){
-		throw new NotImplementedException();
+		byte pickupId = packetReader.NextByte();
+		Vector2 position = packetReader.NextVector2();
+		if(PickupSpawned != null){
+			PickupSpawned(pickupId, position);
+		}else{
+			PickupSpawnedQueue.Enqueue((pickupId,position));
+		}
 	}
 	private void PickupRemovedHandler(PacketReader packetReader){
-		throw new NotImplementedException();
+		PickupRemoved?.Invoke(packetReader.NextByte());
 	}
 }

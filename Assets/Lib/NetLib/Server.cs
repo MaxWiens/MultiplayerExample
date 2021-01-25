@@ -247,6 +247,7 @@ namespace NetLib {
 		private void UDPRecvCallback(IAsyncResult result){
 			try{
 				IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
+				// This can throw an socket exception, Fix this
 				byte[] data = _udpSocket.EndReceive(result, ref endPoint);
 				_udpSocket.BeginReceive(UDPRecvCallback, null); // continue to listen for more data asynchronously
 
