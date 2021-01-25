@@ -7,6 +7,8 @@ public class Server_PlayerControl : MonoBehaviour {
 	public void Move(Vector2 direction){
 		v.x = direction.x;
 		v.z = direction.y;
+		v.Normalize();
+		transform.localRotation = Quaternion.LookRotation(Vector3.down, v);
 		transform.position += v * (_speed * Time.deltaTime);
 	}
 }
