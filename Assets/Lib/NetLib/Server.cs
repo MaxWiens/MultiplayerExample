@@ -22,6 +22,7 @@ namespace NetLib {
 
 		private Stack<byte> _avilableClientIDs;
 		private Dictionary<byte,Client> _clients;
+		private Dictionary<IPEndPoint,Client> _endpointClients;
 		private TcpListener _tcpListener;
 		private UdpClient _udpSocket;
 		private Server_NetLibPackets _packets = new Server_NetLibPackets();
@@ -50,6 +51,7 @@ namespace NetLib {
 				throw new ArgumentOutOfRangeException($"Max clients greater than max value {byte.MaxValue}");
 
 			_clients = new Dictionary<byte, Client>();
+			_endpointClients = new Dictionary<IPEndPoint, Client>();
 			_avilableClientIDs = new Stack<byte>(MaxClients);
 			_threadManager = new ThreadManager();
 			MaxClients = maxClients;
@@ -198,7 +200,9 @@ namespace NetLib {
 				#if (NETWORK_DEBUG)
 					Globals.DebugLog?.Invoke($"Creating Client idx: {newClientIdx} for {socket.Client.RemoteEndPoint}");
 				#endif
-				_clients[newClientIdx] = new Client(socket, newClientIdx, this);
+				Client c = new Client(socket, newClientIdx, this);
+				_clients.Add(newClientIdx, c);
+				_endpointClients.Add((IPEndPoint)socket.Client.RemoteEndPoint, c);
 				// send welcome message
 				SendWelcome(newClientIdx);
 				_threadManager.ExecuteOnMainThread(()=>ClientConnected?.Invoke(newClientIdx));
@@ -225,10 +229,7 @@ namespace NetLib {
 				if(data.Length <= 0) return;
 
 				using(PacketReader pr = new PacketReader(data)){
-					byte clientIdx = pr.NextByte();
-					Client client;
-					if((client = _clients[clientIdx]) != null && client.EndPointStr == endPoint.ToString()){ // TODO string comparison?
-
+					if(_endpointClients.TryGetValue(endPoint, out Client client) && client.EndPointStr == endPoint.ToString()){ // TODO string comparison?
 						// handle data
 						int packetlength = pr.NextInt();
 						if(pr.UnreadLength >= packetlength){
@@ -237,7 +238,7 @@ namespace NetLib {
 								using(PacketReader packetReader = new PacketReader(packetBytes)){
 									ushort packetType = (ushort)packetReader.NextShort();
 									if(_handlers.TryGetValue(packetType, out ServerPacketHandler handler))
-										handler(clientIdx, packetReader);
+										handler(client.ClientIndex, packetReader);
 									#if (NETWORK_DEBUG)
 									else {
 										Globals.DebugLog?.Invoke($"No Client Packethandler for {packetType}");
@@ -262,7 +263,9 @@ namespace NetLib {
 		public void Disconnect(byte clientIdx){
 			if(_clients.TryGetValue(clientIdx, out Client client)){
 				client.TcpStream.Close();
+				_endpointClients.Remove(client.IPEndPoint);
 				_clients.Remove(clientIdx);
+
 				_avilableClientIDs.Push(clientIdx);
 				_threadManager.ExecuteOnMainThread(()=>ClientDisconnected?.Invoke(clientIdx));
 			}
@@ -316,6 +319,7 @@ namespace NetLib {
 					Array.Copy(_tcpRecvBuffer, data, byteLength);
 
 					TCPHandleData(data);
+					TcpStream.BeginRead(_tcpRecvBuffer, 0, Globals.DATA_BUFFER_SIZE, TCPReceiveCallback, null);
 				}catch(Exception ex){
 					#if (NETWORK_DEBUG)
 						Globals.DebugLog?.Invoke($"Error receiving TCP data: {ex}");

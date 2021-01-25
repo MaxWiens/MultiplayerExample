@@ -19,11 +19,13 @@ public class Server_PlayerManager : MonoBehaviour {
 	private void OnEnable() {
 		_server.PlayerJoined += OnPlayerJoined;
 		_server.PlayerLeft += OnPlayerLeave;
+		_packets.PlayerMoved += OnPlayerMove;
 	}
 
 	private void OnDisable() {
 		_server.PlayerJoined -= OnPlayerJoined;
 		_server.PlayerLeft -= OnPlayerLeave;
+		_packets.PlayerMoved -= OnPlayerMove;
 	}
 
 	private void Start() {
@@ -33,6 +35,12 @@ public class Server_PlayerManager : MonoBehaviour {
 			if(!SpawnPlayer(playerData)){
 				Debug.LogError("Unable to spawn player, pool is full!");
 			}
+		}
+	}
+
+	private void OnPlayerMove(byte playerIdx, Vector2 moveVec){
+		if(_players.TryGetValue(playerIdx, out EntityData data)){
+			data.Object.GetComponent<Server_PlayerControl>().Move(moveVec);
 		}
 	}
 
@@ -63,7 +71,10 @@ public class Server_PlayerManager : MonoBehaviour {
 		// set manager callbacks
 		player.GetComponent<IManaged>().SetCallbacks(UnmanagePlayer);
 		// set score to zero
-		player.GetComponent<IScorable>().Value = 0;
+		Score s = player.GetComponent<Score>();
+		s.Value = 0;
+		s.ScoreChanged += SendScore;
+
 
 		foreach(var pl in _players.Values){
 			if(pl.ID != playerData.ID){
@@ -83,6 +94,14 @@ public class Server_PlayerManager : MonoBehaviour {
 			_server.SendTCPAll(p.Build());
 		}
 		return true;
+	}
+
+	private void SendScore(Score s){
+		using (PacketBuilder p = new PacketBuilder(_packets.PlayerScoreID)){
+			p.Write(s.GetComponent<IEntity>().Data.ID);
+			p.Write(s.Value);
+			_server.SendUDPAll(p.Build());
+		}
 	}
 
 	private void FixedUpdate() {
@@ -117,9 +136,9 @@ public class Server_PlayerManager : MonoBehaviour {
 		}
 	}
 
-
 	private void UnmanagePlayer(GameObject player){
 		if(!_managedPlayerPool.PutBack(player)){
+			player.GetComponent<Score>().ScoreChanged -= SendScore;
 			Debug.LogWarning("Player not managed by this manager");
 		}
 	}

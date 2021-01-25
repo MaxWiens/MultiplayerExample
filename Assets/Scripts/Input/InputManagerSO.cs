@@ -41,4 +41,17 @@ public class InputManagerSO : ScriptableObject, GameInputs.IGameplayActions {
 			v.y = -v.y;
 		CameraRotated?.Invoke(v*Sensitivity);
 	}
+
+	public void OnToggleCameraLock(InputAction.CallbackContext context)
+	{
+		if(context.phase == InputActionPhase.Performed){
+			if(Cursor.lockState == CursorLockMode.Locked){
+				Cursor.lockState = CursorLockMode.None;
+				Cursor.visible = true;
+			}else{
+				Cursor.lockState = CursorLockMode.Locked;
+				Cursor.visible = false;
+			}
+		}
+	}
 }

@@ -8,7 +8,7 @@ using ServerPTD = NetLib.PacketTypeData<NetLib.ServerPacketHandler>;
 public class Server_PacketsSO : ScriptableObject {
 	[SerializeField, NotNull]
 	private Server_ServerSO _server = null;
-
+	public event Action<byte,Vector2> PlayerMoved;
 	public ushort PlayerJoinedID {get; private set;}
 	public ushort PlayerRemovedID {get; private set;}
 	public ushort PlayerTransformUpdateID {get; private set;}
@@ -47,6 +47,6 @@ public class Server_PacketsSO : ScriptableObject {
 	}
 
 	private void PlayerMoveHandler(byte senderIdx, PacketReader packetReader){
-		throw new NotImplementedException();
+		PlayerMoved?.Invoke(senderIdx, packetReader.NextVector2());
 	}
 }

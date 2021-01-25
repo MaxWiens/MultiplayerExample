@@ -6,9 +6,8 @@ public class PointCubeSO : ItemSO {
   private int _value = 1;
   public int Value => _value;
 
-  public override System.Type HandlerType => typeof(IScorable);
 	public override bool Effect(object o) {
-		if(o is IScorable s){
+		if(o is Score s){
       s.Value += _value;
       return true;
     }

@@ -14,9 +14,9 @@ public class ScoreDisplay : MonoBehaviour {
 		_score.ScoreChanged -= OnScoreChanged;
 	}
 	private void Start() {
-		OnScoreChanged(_score.Value);
+		OnScoreChanged(_score);
 	}
-	private void OnScoreChanged(int newScore){
-		_text.text = newScore.ToString();
+	private void OnScoreChanged(Score s){
+		_text.text = s.Value.ToString();
 	}
 }

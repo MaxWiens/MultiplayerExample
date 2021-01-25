@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &6002473165403888308
+--- !u!114 &3760516732622630641
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,21 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5746386996259459182}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe7fded9dc1d3064e8053ed958790f80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _input: {fileID: 11400000, guid: 97b2f0fc9d41f1c4986df646cbf83037, type: 2}
-  _playerCamera: {fileID: 0}
---- !u!114 &6503889112537074609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5746386996259459182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d2485f77280832419ccc9307375dce9, type: 3}
+  m_Script: {fileID: 11500000, guid: 91dbf391e815223438fba3681bc7c058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _value: 0
@@ -39,6 +25,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68c3bc39f0e781d4b9a8ba86c9c25f54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6002473165403888308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5746386996259459182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe7fded9dc1d3064e8053ed958790f80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _input: {fileID: 11400000, guid: 97b2f0fc9d41f1c4986df646cbf83037, type: 2}
+  _client: {fileID: 11400000, guid: 3cc736470923c304e87117cbd5e3f550, type: 2}
+  _packets: {fileID: 11400000, guid: e6508d7a7a6c8f64780101f344980011, type: 2}
+  _playerCamera: {fileID: 0}
+--- !u!114 &6503889112537074609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5746386996259459182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d2485f77280832419ccc9307375dce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _value: 0
 --- !u!1 &5973478809257714852
 GameObject:
   m_ObjectHideFlags: 0

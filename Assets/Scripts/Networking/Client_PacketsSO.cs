@@ -8,6 +8,7 @@ public class Client_PacketsSO : ScriptableObject {
 	public Queue<(byte,Vector2)> PlayerJoinedQueue = new Queue<(byte, Vector2)>();
 	public event Action<byte,Vector2> PlayerJoined;
 	public event Action<byte,Vector2,float> PlayerTransformUpdate;
+	public event Action<byte,int> PlayerScoreChanged;
 
 	public ushort PlayerMoveID {get; private set;}
 
@@ -61,7 +62,11 @@ public class Client_PacketsSO : ScriptableObject {
 	}
 
 	private void PlayerScoreHandler(PacketReader packetReader){
-		throw new NotImplementedException();
+		if(PlayerScoreChanged != null){
+			byte playerId = packetReader.NextByte();
+			int score = packetReader.NextInt();
+			PlayerScoreChanged(playerId, score);
+		}
 	}
 
 	// Pickup

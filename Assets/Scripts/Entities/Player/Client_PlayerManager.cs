@@ -20,11 +20,13 @@ public class Client_PlayerManager : MonoBehaviour {
 	private void OnEnable() {
 		_packets.PlayerJoined += OnPlayerJoined;
 		_packets.PlayerTransformUpdate += OnPlayerTransformUpdate;
+		_packets.PlayerScoreChanged += OnPlayerScoreChange;
 	}
 
 	private void OnDisable() {
 		_packets.PlayerJoined -= OnPlayerJoined;
 		_packets.PlayerTransformUpdate -= OnPlayerTransformUpdate;
+		_packets.PlayerScoreChanged -= OnPlayerScoreChange;
 	}
 
 	private void Start() {
@@ -45,7 +47,7 @@ public class Client_PlayerManager : MonoBehaviour {
 
 			player.transform.position = new Vector3(position.x,1f,position.y);
 			player.GetComponent<IEntity>().Data = data;
-			player.GetComponent<IScorable>().Value = 0;
+			player.GetComponent<Score>().Value = 0;
 			LocalPlayerData = data;
 			_players.Add(playerIdx, data);
 			_cameraFollow.Target = player.transform;
@@ -54,6 +56,12 @@ public class Client_PlayerManager : MonoBehaviour {
 		}else if(!_players.ContainsKey(playerIdx)){
 			_players.Add(playerIdx, data);
 			SpawnRemotePlayer(data, position);
+		}
+	}
+
+	private void OnPlayerScoreChange(byte playerID, int score){
+		if(_players.TryGetValue(playerID, out EntityData data)){
+			data.Object.GetComponent<Score>().Value = score;
 		}
 	}
 
@@ -68,7 +76,7 @@ public class Client_PlayerManager : MonoBehaviour {
 		// set manager callbacks
 		player.GetComponent<IManaged>().SetCallbacks(UnmanagePlayer);
 		// set score to zero
-		player.GetComponent<IScorable>().Value = 0;
+		player.GetComponent<Score>().Value = 0;
 		return true;
 	}
 
