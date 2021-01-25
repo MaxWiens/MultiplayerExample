@@ -44,7 +44,7 @@ public class Client_ClientSO : ScriptableObject {
 		EditorApplication.playModeStateChanged -= OnPlayModeChanged;
 		#endif
 		if(_client != null){
-			Disconnect(Client.DisconnectReason.UserDisconnected, "Client ScriptableObject Disabled or closed");
+			Disconnect(Client.DisconnectReason.UserDisconnected, "Closed application or Client ScriptableObject Disabled");
 		}
 	}
 

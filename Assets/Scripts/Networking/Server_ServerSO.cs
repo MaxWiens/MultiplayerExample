@@ -86,6 +86,7 @@ public class Server_ServerSO : ScriptableObject {
 	private void ResetSO(){
 		IsRunning = false;
 		if(_server != null){
+			_server.Stop();
 			_server.ClientConnected -= OnClientConnected;
 			_server.ClientDisconnected -= OnClientDisconnect;
 			_server = null;

@@ -10,7 +10,7 @@ public class Client_PlayerControl : MonoBehaviour {
 	[SerializeField]
 	private Transform _playerCamera = null;
 
-	private Vector3 _previousInputMoveVec;
+	private Vector3 _inputMoveVec;
 
 	private void OnEnable() {
 		_input.Moved += OnInputMoveVectorChange;
@@ -24,11 +24,13 @@ public class Client_PlayerControl : MonoBehaviour {
 		}
 	}
 
-	private Vector3 previous;
-	private void Update() {
+	private Vector3 _prev;
+	private void FixedUpdate() {
 		Vector3 v = _playerCamera.forward;
-		v = Quaternion.LookRotation(v.normalized) * _previousInputMoveVec;
-		if(v.magnitude == 0f && previous.magnitude == 0f ) return;
+		v = Quaternion.LookRotation(v.normalized) * _inputMoveVec;
+
+		if(v == _prev) return;
+		_prev = v;
 		// send v to server
 		using(PacketBuilder packetBuilder = new PacketBuilder(_packets.PlayerMoveID)){
 			packetBuilder.Write(new Vector2(v.x,v.z));
@@ -37,7 +39,7 @@ public class Client_PlayerControl : MonoBehaviour {
 	}
 
 	public void OnInputMoveVectorChange(Vector2 inputMoveVec){
-		_previousInputMoveVec.Set(inputMoveVec.x,0f,inputMoveVec.y);
-		_previousInputMoveVec.Normalize();
+		_inputMoveVec.Set(inputMoveVec.x,0f,inputMoveVec.y);
+		_inputMoveVec.Normalize();
 	}
 }

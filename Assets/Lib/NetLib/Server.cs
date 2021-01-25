@@ -73,6 +73,24 @@ namespace NetLib {
 
 			return _threadManager.Update;
 		}
+		public void Stop(){
+			if(_clients != null){
+				foreach(var v in _clients.Keys){
+					Disconnect(v);
+				}
+			}
+			if(_udpSocket != null){
+				_udpSocket.Dispose();
+				_udpSocket = null;
+			}
+			if(_tcpListener != null){
+				_tcpListener.Stop();
+				_udpSocket = null;
+			}
+			if(_threadManager != null){
+				_threadManager = null;
+			}
+		}
 
 		/// <summary>
 		/// Sends a packet to a client using TCP
@@ -182,37 +200,43 @@ namespace NetLib {
 		/// </summary>
 		/// <param name="result">Result of the connection</param>
 		private void TCPConnectCallback(IAsyncResult result){
-			TcpClient socket = _tcpListener.EndAcceptTcpClient(result);
-			_tcpListener.BeginAcceptTcpClient(TCPConnectCallback, null); // continue to listen for annother connection asynchronously
-			#if (NETWORK_DEBUG)
-				Globals.DebugLog?.Invoke($"Incoming connection from {socket.Client.RemoteEndPoint}");
-			#endif
-			int count = _clients.Count;
-			// add client to clients array
-			if(count < MaxClients){
-				byte newClientIdx;
-				if(_avilableClientIDs.Count > 0){
-					newClientIdx = _avilableClientIDs.Pop();
+			try{
+				TcpClient socket = _tcpListener.EndAcceptTcpClient(result);
+				_tcpListener.BeginAcceptTcpClient(TCPConnectCallback, null); // continue to listen for annother connection asynchronously
+				#if (NETWORK_DEBUG)
+					Globals.DebugLog?.Invoke($"Incoming connection from {socket.Client.RemoteEndPoint}");
+				#endif
+				int count = _clients.Count;
+				// add client to clients array
+				if(count < MaxClients){
+					byte newClientIdx;
+					if(_avilableClientIDs.Count > 0){
+						newClientIdx = _avilableClientIDs.Pop();
+					}else{
+						newClientIdx = (byte)count;
+					}
+
+					#if (NETWORK_DEBUG)
+						Globals.DebugLog?.Invoke($"Creating Client idx: {newClientIdx} for {socket.Client.RemoteEndPoint}");
+					#endif
+					Client c = new Client(socket, newClientIdx, this);
+					_clients.Add(newClientIdx, c);
+					_endpointClients.Add((IPEndPoint)socket.Client.RemoteEndPoint, c);
+					// send welcome message
+					SendWelcome(newClientIdx);
+					_threadManager.ExecuteOnMainThread(()=>ClientConnected?.Invoke(newClientIdx));
 				}else{
-					newClientIdx = (byte)count;
+					#if (NETWORK_DEBUG)
+						Globals.DebugLog?.Invoke($"{socket.Client.RemoteEndPoint} failed to connect. Server full!");
+					#endif
+
+					// send server full packet
+					SendServerFull((IPEndPoint)socket.Client.RemoteEndPoint);
 				}
-
+			}catch(Exception ex){
 				#if (NETWORK_DEBUG)
-					Globals.DebugLog?.Invoke($"Creating Client idx: {newClientIdx} for {socket.Client.RemoteEndPoint}");
+					Globals.DebugLog?.Invoke($"Error in TCP connect callback : {ex}");
 				#endif
-				Client c = new Client(socket, newClientIdx, this);
-				_clients.Add(newClientIdx, c);
-				_endpointClients.Add((IPEndPoint)socket.Client.RemoteEndPoint, c);
-				// send welcome message
-				SendWelcome(newClientIdx);
-				_threadManager.ExecuteOnMainThread(()=>ClientConnected?.Invoke(newClientIdx));
-			}else{
-				#if (NETWORK_DEBUG)
-					Globals.DebugLog?.Invoke($"{socket.Client.RemoteEndPoint} failed to connect. Server full!");
-				#endif
-
-				// send server full packet
-				SendServerFull((IPEndPoint)socket.Client.RemoteEndPoint);
 			}
 		}
 
