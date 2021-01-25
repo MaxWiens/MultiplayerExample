@@ -53,7 +53,7 @@ public class Client_PacketsSO : ScriptableObject {
 	}
 
 	private void PlayerRemovedHandler(PacketReader packetReader){
-		throw new NotImplementedException();
+
 	}
 
 	private void PlayerTransformUpdateHandler(PacketReader packetReader){
