@@ -6,8 +6,7 @@ namespace NetLib {
 		public enum RegisterResult : byte {
 			Successful,
 			Full,
-			NameAlreadyRegistered,
-			NoHandlers
+			NameAlreadyRegistered
 		}
 	}
 
@@ -24,8 +23,6 @@ namespace NetLib {
 						throw new RegisterException("Packet registry became full");
 					case PacketRegistry.RegisterResult.NameAlreadyRegistered:
 						throw new RegisterException($"Packet name \"{d.Name}\" already registered");
-					case PacketRegistry.RegisterResult.NoHandlers:
-						throw new RegisterException($"Packet \"{d.Name}\" has no handlers or senders");
 				}
 			}
 		}
